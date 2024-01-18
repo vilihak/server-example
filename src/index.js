@@ -30,9 +30,16 @@ app.get('/items', (req, res) => {
 // GET http://127.0.0.1:3000/items/<ID>
 app.get('/items/:id', (req, res) => {
   // TODO: palauta vain se objekti, jonka id vastaa pyydettyä
-  console.log('requested item id', req.params.id);
-  let item = 'tämän tilalle oikea objekti';
-  res.json(item);
+  const requestedId = parseInt(req.params.id);
+  const item = items.find(item => item.id === requestedId);
+
+  if (item) {
+    // If the item is found, send it in the response
+    res.json(item);
+  } else {
+    // If the item is not found, send a 404 Not Found status
+    res.status(404).json({ error: 'Item not found' });
+  }
 });
 
 // Itemin lisäys
