@@ -1,0 +1,106 @@
+body {
+    background-color: #51d0de;
+    font-family: Arial, sans-serif;
+    padding: 0;
+}
+
+.container {
+    width: 60%;
+    margin: auto;
+}
+
+header {
+    display: flex;
+}
+
+nav {
+    width: 100%;
+    justify-content: space-between;
+    background-color: #d9d9d9;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+}
+
+h1 {
+    background-color: #d9d9d9;
+    width: 100%;
+}
+
+ul {
+    display: flex;
+    list-style-type: none;
+    justify-content: space-between;
+    padding: 0;
+}
+
+li.logo {
+    width: 30%;
+}
+
+li a {
+    color: black;
+    width: 10rem;
+    height: 5rem;
+    font-size: 25px;
+    line-height: 5rem;
+    text-align: center;
+}
+
+li a:hover {
+    background-color: #bf4aa8;
+    width: 100%;
+}
+
+.containerx {
+    background-color: #d9d9d9;
+    overflow: hidden;
+    padding-bottom: 3rem;
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+    margin-bottom: 3rem;
+}
+
+.logo-sydän {
+    float: left;
+    max-width: 50%;
+    max-height: 50%;
+    margin-right: 20px;
+    padding: 1rem;
+}
+
+.text-container {
+    float: left;
+    width: calc(50% - 20px);
+}
+
+main {
+    overflow: hidden;
+}
+
+.maintext {
+    margin-right: 20rem;
+    font-size: 20px;
+    padding-left: 10px;
+}
+
+footer {
+    background-color: #bf4aa8;
+    width: 100%;
+    height: 5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.footertxt{
+    font-family: "Comic Sans MS";
+}
+
+.logo-img{
+    max-width: 100%;
+}
+
+.headertext{
+    font-size: 25px;
+    padding: 2rem;
+}

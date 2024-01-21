@@ -34,10 +34,10 @@ app.get('/items/:id', (req, res) => {
   const item = items.find(item => item.id === requestedId);
 
   if (item) {
-    // If the item is found, send it in the response
+    // item is found returns below
     res.json(item);
   } else {
-    // If the item is not found, send a 404 Not Found status
+    // item not found retursn below
     res.status(404).json({ error: 'Item not found' });
   }
 });
