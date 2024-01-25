@@ -1,0 +1,111 @@
+
+body {
+  background-color: #51d0de;
+  font-family: Arial, sans-serif;
+}
+
+.all {
+margin: auto;
+width: 80%;
+}
+
+.topnav {
+background-color: #333;
+overflow: hidden;
+}
+
+.topnav a {
+float: right;
+color: #f2f2f2;
+text-align: center;
+padding: 14px 16px;
+text-decoration: none;
+font-size: 30px;
+}
+
+.topnav a:hover {
+background-color: #ddd;
+color: black;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.topnav a.split {
+float: left;
+background-color: #bf4aa8;
+color: white;
+}
+
+.headertext {
+  font-size: 25px;
+  padding: 2rem;
+}
+
+.logo-heart{
+  float: left;
+}
+
+.container {
+  margin: auto;
+  background-color: #d9d9d9;
+  padding-bottom: 3rem;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  margin-bottom: 3rem;
+  position: relative;
+  border-radius: 25px;
+}
+
+.logo-sydän {
+  float: left;
+  max-width: 50%;
+  max-height: 50%;
+  margin-right: 20px;
+  padding: 1rem;
+}
+
+.logo-heart {
+  max-width: 25%;
+  max-height: 25%;
+  right: -60px;
+  top: -40px;
+  position: absolute;
+  padding: 1rem;
+}
+
+.maintext {
+font-size: 20px;
+padding-left: 10px;
+padding-right: 15rem;
+padding-top: 1rem;
+}
+
+footer {
+  background-color: #bf4aa8;
+  width: 100%;
+  height: 5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.footertxt {
+  font-family: "Comic Sans MS";
+}
+
+.dynamic{
+  background-color: white;
+  margin: auto;
+  width: 25%;
+  border-radius: 25px;
+  border-radius: 25px;
+}
+
+.dp{
+  font-size: 20px;
+}
+.dynamiclist {
+  list-style-type: none;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  padding: 1rem;
+  border-radius: 25px;
+}
+

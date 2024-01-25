@@ -2,10 +2,13 @@
 import express from 'express';
 import path from 'path';
 import {fileURLToPath} from 'url';
+import {deleteItem, getItemById, getItems, postItem, putItem} from './items.mjs';
 const hostname = '127.0.0.1';
 const port = 3000;
 const app = express();
 
+
+app.use(express.json());
 // Staattinen sivusto palvelimen juureen (public-kansion sisältö näkyy osoitteessa http://127.0.0.1:3000/sivu.html)
 app.use(express.static('public'));
 const __filename = fileURLToPath(import.meta.url);
@@ -14,40 +17,18 @@ const __dirname = path.dirname(__filename);
 // Tarjoiltava kansio määritellään relatiivisella polulla
 app.use('/sivusto', express.static(path.join(__dirname, '../public')));
 
-// mock data for simple API
-const items = [
-  {id: 1, name: 'Item 1'},
-  {id: 2, name: 'Item 2'},
-  {id: 3, name: 'Item kolme'},
-  {id: 4, name: 'Item neljä'},
-];
 
+// RESOURCE /item endpoints
 // GET http://127.0.0.1:3000/items
-app.get('/items', (req, res) => {
-  res.json(items);
-});
-
+app.get('/items', getItems);
 // GET http://127.0.0.1:3000/items/<ID>
-app.get('/items/:id', (req, res) => {
-  // TODO: palauta vain se objekti, jonka id vastaa pyydettyä
-  const requestedId = parseInt(req.params.id);
-  const item = items.find(item => item.id === requestedId);
-
-  if (item) {
-    // item is found returns below
-    res.json(item);
-  } else {
-    // item not found retursn below
-    res.status(404).json({ error: 'Item not found' });
-  }
-});
-
-// Itemin lisäys
-// POST http://127.0.0.1:3000/items/
-app.post('/items', (req, res) => {
-  // TODO (vapaaehtonen, jatketaan tästä ens kerralla): lisää postattu item items-taulukkoon
-  res.json({message: 'item created'});
-});
+app.get('/items/:id', getItemById);
+// POST http://127.0.0.1:3000/items/ (Itemin lisäys)
+app.post('/items', postItem);
+// PUT
+app.put('/items/:id', putItem);
+// DELETE
+app.delete('/items/:id', deleteItem);
 
 // GET http://127.0.0.1:3000
 // ei toimi tällä hetkellä, koska public-server tarjoilee index.html:n ensin
