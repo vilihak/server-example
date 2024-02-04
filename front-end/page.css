@@ -137,8 +137,7 @@ footer {
 
     .topnav a.split {
       float: none;
-      background-color: #bf4aa8; /* You may need to add the background color for the split link */
-      color: white;
+      background-color: #bf4aa8;
     }
 
     .topnav a.icon {
