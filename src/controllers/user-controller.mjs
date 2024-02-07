@@ -18,8 +18,8 @@ const users = [
     email: "bobsmith@example.com"
   }
 ];
-
-// TODO: implement route handlers below for users
+// TODO: USE userModel (database) INSTEAD OF MOCKDATA
+// TODO: implement route handlers below for users (real data)
 
 const getUsers = (req, res) => {
   res.json(users);
