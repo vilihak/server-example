@@ -63,7 +63,7 @@ const postUser = async (req, res) => {
 const putUser = async (req, res) => {
   const user_id = req.params.id;
   const {username, password, email} = req.body;
-  // CHECK THAT ALL NEEDED FIELDS ARE INCLUDED IN REQUEST
+  // CHECKS THAT ALL NEEDED FIELDS ARE INCLUDED IN REQUEST
   if (user_id && username && password && email) {
     const result = await updateUserById({user_id, ...req.body});
     if (result.error) {

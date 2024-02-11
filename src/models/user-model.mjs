@@ -73,7 +73,7 @@ const deleteUserById = async (id) => {
         }
         return {message: 'User deleted', user_id: user.user_id};
     } catch (error) {
-        // NOW DUPLICATE ENTRY ERROR IS GENERIC 500 ERROR, SHOULD BE FIXED TO '400: BAD REQUEST'
+        // NNOTE THTAT USERS WITH OTHER DATA (FK CONSTRRAIT) CANT BE DELETED DIRECTLY
         console.error('deleteUserById', error);
         return {error: 500, message: 'DB ERROR'};
     }
