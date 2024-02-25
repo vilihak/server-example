@@ -1,11 +1,26 @@
-import {addEntry, findEntryById, listAllEntries} from "../models/entry-model.mjs";
+import {
+  listAllEntries,
+  findEntryById,
+  addEntry,
+  deleteEntryById,
+  updateEntryById,
+  listAllEntriesByUserId,
+} from '../models/entry-model.mjs';
 
-const getEntries = (req, res) => {
-  res.json(listAllEntries());
+const getEntries = async (req, res) => {
+  // return only logged in user's own entries
+  // - get user's id from token (req.user.user_id)
+  const result = await listAllEntriesByUserId(req.user.user_id);
+  if (!result.error) {
+    res.json(result);
+  } else {
+    res.status(500);
+    res.json(result);
+  }
 };
 
-const getEntryById = (req, res) => {
-  const entry = findEntryById(req.params.id);
+const getEntryById = async (req, res) => {
+  const entry = await findEntryById(req.params.id);
   if (entry) {
     res.json(entry);
   } else {
@@ -13,46 +28,43 @@ const getEntryById = (req, res) => {
   }
 };
 
-const postEntry = (req, res) => {
-  const {user_id, entry_date, mood, weight, sleep_hours, notes} = req.body;
-  // validate input, ensure required fields are present
-  if (entry_date && (weight || mood || sleep_hours || notes) && user_id) {
-    addEntry(req.body);
-    res.status(201);
-    res.json({message: 'New entry added.'})
-  } else {
-    res.sendStatus(400);
-  }
-};
-
-const putEntry = (req, res) => {
+const postEntry = async (req, res) => {
   const {user_id, entry_date, mood, weight, sleep_hours, notes} = req.body;
   if (entry_date && (weight || mood || sleep_hours || notes) && user_id) {
-    const updated = updateEntry(req.body);
-    if (updated) {
-      res.status(200);
-      res.json({message: 'Entry updated.'});
+    const result = await addEntry(req.body);
+    if (result.entry_id) {
+      res.status(201);
+      res.json({message: 'New entry added.', ...result});
     } else {
-      res.sendStatus(400);
+      res.status(500);
+      res.json(result);
     }
   } else {
     res.sendStatus(400);
   }
 };
 
-const deleteEntry = (req, res) => {
-  const {user_id, entry_date} = req.body;
-  // validate input, ensure required fields are present
-  if (entry_date && user_id) {
-    const deleted = deleteEntry(req.body);
-    if (deleted) {
-      res.status(200);
-      res.json({message: 'Entry deleted.'});
-    } else {
-      res.sendStatus(400);
+const putEntry = async (req, res) => {
+  const entry_id = req.params.id;
+  const {entry_date, mood, weight, sleep_hours, notes} = req.body;
+  // check that all needed fields are included in request
+  if ((entry_date || weight || mood || sleep_hours || notes) && entry_id) {
+    const result = await updateEntryById({entry_id, ...req.body});
+    if (result.error) {
+      return res.status(result.error).json(result);
     }
+    return res.status(201).json(result);
   } else {
-    res.sendStatus(400);
+    return res.status(400).json({error: 400, message: 'bad request'});
   }
 };
+
+const deleteEntry = async (req, res) => {
+  const result = await deleteEntryById(req.params.id);
+  if (result.error) {
+    return res.status(result.error).json(result);
+  }
+  return res.json(result);
+};
+
 export {getEntries, getEntryById, postEntry, putEntry, deleteEntry};

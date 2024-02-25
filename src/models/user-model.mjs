@@ -1,83 +1,107 @@
-import promisePool from '../utils/database.mjs';
+import promisePool from '../utils/database.mjs'; console.log;
 
 const listAllUsers = async () => {
-try {
-  const sql = 'SELECT username, user_id FROM Users';
-  const [rows] = await promisePool.query(sql);
-  //console.log(rows);
-  return rows;
-} catch (error) {
+  try {
+    const sql = 'SELECT user_id, username, user_level FROM Users';
+    const [rows] = await promisePool.query(sql);
+    //console.log(rows);
+    return rows;
+  } catch (error) {
     console.error('listAllUsers', error);
-    return {error: 500, message: 'DB ERROR'}
-}
+    return {error: 500, message: 'db error'};
+  }
 };
 
 const selectUserById = async (id) => {
-    try {
-        const sql = 'SELECT * FROM Users WHERE user_id=?';
-        const params = [id];
-        const [rows] = await promisePool.query(sql, params);
-        //console.log(rows);
-        // If nothing is found with the user id, result arrau is empty ([])
-        if (rows.length === 0) {
-            return {error: 404, message: 'USER NOT FOUND'};
-        }
-        // REMOVES PASSWORD PROPERTY FROM RESULT
-        delete rows[0].password;
-        return rows[0];
-    } catch (error) {
-        console.error('selectUserById', error);
-        return {error: 500, message: 'DB ERROR'};
+  try {
+    const sql = 'SELECT * FROM Users WHERE user_id=?';
+    const params = [id];
+    const [rows] = await promisePool.query(sql, params);
+    // console.log(rows);
+    // if nothing is found with the user id, result array is empty []
+    if (rows.length === 0) {
+      return {error: 404, message: 'user not found'};
     }
+    // Remove password property from result
+    delete rows[0].password;
+    return rows[0];
+  } catch (error) {
+    console.error('selectUserById', error);
+    return {error: 500, message: 'db error'};
+  }
 };
 
 const insertUser = async (user) => {
-    try {
-        const sql = 'INSERT INTO Users (username, password, email) VALUES (?, ?, ?)';
-        const params = [user.username, user.password, user.email];
-        const [result] = await promisePool.query(sql, params);
-        //console.log(result);
-        return {message: 'New user created', user_id: result.insertId};
-    } catch (error) {
-        // NOW DUPLICATE ENTRY ERROR IS GENERIC 500 ERROR, SHOULD BE FIXED TO '400: BAD REQUEST'
-        console.error('inserUser', error);
-        return {error: 500, message: 'DB ERROR'};
-    }
-
-
+  try {
+    const sql =
+      'INSERT INTO Users (username, password, email) VALUES (?, ?, ?)';
+    const params = [user.username, user.password, user.email];
+    const [result] = await promisePool.query(sql, params);
+    // console.log(result);
+    return {message: 'new user created', user_id: result.insertId};
+  } catch (error) {
+    // now duplicate entry error is generic 500 error, should be fixed to 400 ?
+    console.error('insertUser', error);
+    return {error: 500, message: 'db error'};
+  }
 };
 
 const updateUserById = async (user) => {
-    try {
-        const sql = 'UPDATE Users SET username=?, password=?, email=? WHERE user_id=?';
-        const params = [user.username, user.password, user.email, user.user_id];
-        const [result] = await promisePool.query(sql, params);
-        console.log(result);
-        return {message: 'User updated', user_id: user.user_id};
-    } catch (error) {
-        // NOW DUPLICATE ENTRY ERROR IS GENERIC 500 ERROR, SHOULD BE FIXED TO '400: BAD REQUEST'
-        console.error('updateUserById', error);
-        return {error: 500, message: 'DB ERROR'};
-    }
-
+  try {
+    const sql =
+      'UPDATE Users SET username=?, password=?, email=? WHERE user_id=?';
+    const params = [user.username, user.password, user.email, user.user_id];
+    const [result] = await promisePool.query(sql, params);
+    // console.log(result);
+    return {message: 'user data updated', user_id: user.user_id};
+  } catch (error) {
+    // fix error handling
+    // now duplicate entry error is generic 500 error, should be fixed to 400 ?
+    console.error('updateUserById', error);
+    return {error: 500, message: 'db error'};
+  }
 };
 
 const deleteUserById = async (id) => {
-    try {
-        const sql = 'DELETE FROM Users WHERE user_id=?';
-        const params = [id];
-        const [result] = await promisePool.query(sql, params);
-        console.log(result);
-        if (result.affectedRows ===0 ){
-            return {error: 404, message: 'User not found'}
-        }
-        return {message: 'User deleted', user_id: user.user_id};
-    } catch (error) {
-        // NNOTE THTAT USERS WITH OTHER DATA (FK CONSTRRAIT) CANT BE DELETED DIRECTLY
-        console.error('deleteUserById', error);
-        return {error: 500, message: 'DB ERROR'};
+  try {
+    const sql = 'DELETE FROM Users WHERE user_id=?';
+    const params = [id];
+    const [result] = await promisePool.query(sql, params);
+    // console.log(result);
+    if (result.affectedRows === 0) {
+      return {error: 404, message: 'user not found'};
     }
+    return {message: 'user deleted', user_id: id};
+  } catch (error) {
+    // note that users with other data (FK constraint) cant be deleted directly
+    console.error('deleteUserById', error);
+    return {error: 500, message: 'db error'};
+  }
 };
 
-export {listAllUsers, selectUserById, insertUser, updateUserById, deleteUserById};
+// Used for login
+const selectUserByUsername = async (username) => {
+  try {
+    const sql = 'SELECT * FROM Users WHERE username=?';
+    const params = [username];
+    const [rows] = await promisePool.query(sql, params);
+    // console.log(rows);
+    // if nothing is found with the username, login attempt has failed
+    if (rows.length === 0) {
+      return {error: 401, message: 'invalid username or password'};
+    }
+    return rows[0];
+  } catch (error) {
+    console.error('selectUserByNameAndPassword', error);
+    return {error: 500, message: 'db error'};
+  }
+};
 
+export {
+  listAllUsers,
+  selectUserById,
+  insertUser,
+  updateUserById,
+  deleteUserById,
+  selectUserByUsername,
+};
