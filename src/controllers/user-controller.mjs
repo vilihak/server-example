@@ -1,114 +1,80 @@
-const users = [
-  {
-    id: 1,
-    username: "johndoe",
-    password: "password1",
-    email: "johndoe@example.com"
-  },
-  {
-    id: 2,
-    username: "janedoe",
-    password: "password2",
-    email: "janedoe@example.com"
-  },
-  {
-    id: 3,
-    username: "bobsmith",
-    password: "password3",
-    email: "bobsmith@example.com"
-  }
-];
-// TODO: USE userModel (database) INSTEAD OF MOCKDATA
-// TODO: implement route handlers below for users (real data)
+import bcrypt from 'bcryptjs';
+import {
+  deleteUserById,
+  insertUser,
+  listAllUsers,
+  selectUserById,
+  updateUserById,
+} from '../models/user-model.mjs';
+import {customError} from '../middlewares/error-handler.mjs';
 
-const getUsers = (req, res) => {
-  res.json(users);
+const getUsers = async (req, res, next) => {
+  const result = await listAllUsers();
+  if (result.error) {
+    return next(customError(result, result.error));
+  }
+  return res.json(result);
 };
 
-const getUserById = (req, res) => {
-  const userId = parseInt(req.params.id);
-  const userFound = users.find(user => user.id === userId);
-
-  if (userFound) {
-    res.json(userFound);
-  } else {
-    res.status(404).json({ error: 'User not found' });
+const getUserById = async (req, res, next) => {
+  const result = await selectUserById(req.params.id);
+  if (result.error) {
+    return next(customError(result, result.error));
   }
+  return res.json(result);
 };
 
-const postUser = (req, res) => {
-  const newUser = req.body;
-
-  // validate if required fields are present
-  if (!newUser.username || !newUser.password || !newUser.email) {
-    return res.status(400).json({ error: 'Incomplete user information' });
-  }
-
-  // checks if username is already taken
-  const usernameTaken = users.some(user => user.username === newUser.username);
-  if (usernameTaken) {
-    return res.status(400).json({ error: 'Username already taken' });
-  }
-
-  // generate a new unique ID
-  const newUserId = users.length + 1;
-
-  // create the new user object
-  const user = {
-    id: newUserId,
-    username: newUser.username,
-    password: newUser.password,
-    email: newUser.email
-  };
-
-  // add the new user to the array
-  users.push(user);
-
-  res.status(201).json({ message: 'User created successfully', user });
+const postUser = async (req, res, next) => {
+  const {username, password, email} = req.body;
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  const result = await insertUser(
+    {
+      username,
+      email,
+      password: hashedPassword,
+    },
+    next,
+  );
+  return res.status(201).json(result);
 };
 
-const putUser = (req, res) => {
-  const userId = parseInt(req.params.id);
-  const userToUpdate = users.find(user => user.id === userId);
-
-  if (!userToUpdate) {
-    return res.status(404).json({ error: 'User not found' });
+const putUser = async (req, res, next) => {
+  // Get userinfo from req.user object extracted from token
+  // Only user authenticated by token can update own data
+  // TODO: admin user can update any user (incl. user_level)
+  const userId = req.user.user_id;
+  const {username, password, email} = req.body;
+  // hash password if included in request
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  const result = await updateUserById({
+    userId,
+    username,
+    password: hashedPassword,
+    email,
+  });
+  if (result.error) {
+    return next(customError(result, result.error));
   }
-
-  const updatedUser = req.body;
-
-  if (updatedUser.username) {
-    userToUpdate.username = updatedUser.username;
-  }
-
-  if (updatedUser.password) {
-    userToUpdate.password = updatedUser.password;
-  }
-
-  if (updatedUser.email) {
-    userToUpdate.email = updatedUser.email;
-  }
-
-  res.json({ message: 'User updated successfully', user: userToUpdate });
+  return res.status(200).json(result);
 };
 
-// Dummy login, returns user object if username & password match
-const postLogin = (req, res) => {
-  const userCreds = req.body;
-  if (!userCreds.username || !userCreds.password) {
-    return res.sendStatus(400);
+const deleteUser = async (req, res, next) => {
+  // console.log('deleteUser', req.user, req.params.id);
+  // admin user can delete any user
+  // user authenticated by token can delete itself
+  if (
+    req.user.user_level !== 'admin' &&
+    req.user.user_id !== parseInt(req.params.id)
+  ) {
+    return next(customError('Unauthorized', 401));
   }
-  const userFound = users.find(user => user.username == userCreds.username);
-  // user not found
-  if (!userFound) {
-    return res.status(403).json({error: 'username/password invalid'});
+  const result = await deleteUserById(req.params.id);
+  if (result.error) {
+    return next(customError(result, result.error));
   }
-  // check if posted password matches to user found password
-  if (userFound.password === userCreds.password) {
-    res.json({message: 'logged in successfully', user: userFound});
-  } else {
-    return res.status(403).json({error: 'username/password invalid'});
-  }
+  return res.json(result);
 };
 
-export {getUsers, getUserById, postUser, putUser, postLogin};
+export {getUsers, getUserById, postUser, putUser, deleteUser};
