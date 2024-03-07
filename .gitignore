@@ -1,4 +1,4 @@
 node_modules
 .vscode
-database/create-db-user.sql
+db/create-db-user.sql
 .env
