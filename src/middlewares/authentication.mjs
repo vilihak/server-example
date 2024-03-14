@@ -3,10 +3,10 @@ import 'dotenv/config';
 import {customError} from './error-handler.mjs';
 
 const authenticateToken = (req, res, next) => {
-  // console.log('authenticateToken', req.headers);
+  console.log('authenticateToken', req.headers);
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
-  // console.log('token', token);
+  console.log('token', token);
   if (!token) {
     return next(customError('Token missing', 401));
   }
